@@ -1,0 +1,12 @@
+﻿Build started 1/6/2017 12:19:59 PM.
+     1>Project "F:\EPart\Facultate\An IV\ALPD\Tema\ALPDmapreduce\ALPDmapreduce\ALPDmapreduce.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         I:\VS2012\VC\bin\CL.exe /c /I"C:\Program Files (x86)\Microsoft SDKs\MPI\Include\\" /I"C:\Program Files (x86)\Microsoft SDKs\MPI\Include\\x64" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /FImpi.h /analyze- /errorReport:prompt ALPDmapreduce.cpp
+         ALPDmapreduce.cpp
+     1>f:\epart\facultate\an iv\alpd\tema\alpdmapreduce\alpdmapreduce\alpdmapreduce.cpp(145): error C2653: 'MPI' : is not a class or namespace name
+     1>f:\epart\facultate\an iv\alpd\tema\alpdmapreduce\alpdmapreduce\alpdmapreduce.cpp(145): error C3861: 'Init': identifier not found
+     1>Done Building Project "F:\EPart\Facultate\An IV\ALPD\Tema\ALPDmapreduce\ALPDmapreduce\ALPDmapreduce.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:01.97
