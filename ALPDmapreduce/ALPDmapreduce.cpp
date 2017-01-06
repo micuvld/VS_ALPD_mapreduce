@@ -16,16 +16,101 @@ int main(int argc, char *argv[]) {
 	string path = "output/";
 	string inputFilesPath = "test-files/";
 	string inputFilesExtension = ".txt";
+	string outputFileName;
 	ifstream inputFile;
 	ofstream outFile;
-
 	string fileNames[25];
-	char i;
+	char *fileNameChar;
+	char i,j;
 
-	for (i = 1; i < 25; ++i) {
+	int commSize;
+	int my_rank;
+	int numberOfWorkers;
+
+	int numberOfInputFiles = 25;
+	int numberOfMappedFiles = 0;
+	int nextInputFileIndex = 0;
+	char receivedFileName[50];
+	int messageLength;
+	MPI_Status status;
+
+	vector<string> filesToSort;
+
+	for (i = 1; i <= numberOfInputFiles; ++i) {
 		fileNames[i-1] = (inputFilesPath + to_string((i + '\0')) + inputFilesExtension);
-		cout << fileNames[i-1]<<endl;
 	}
+
+	MPI_Init(&argc, &argv);
+
+    MPI_Comm_size(MPI_COMM_WORLD, &commSize);
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+
+	numberOfWorkers = commSize - 1;
+
+	if (my_rank == 0) {
+		//send files to all proceses
+		while (nextInputFileIndex < numberOfWorkers) {
+			fileNameChar = stringToChar(fileNames[nextInputFileIndex]);
+			MPI_Send(fileNameChar, fileNames[nextInputFileIndex].length() + 1, MPI_CHAR, nextInputFileIndex + 1, Operations::MAP, MPI_COMM_WORLD);
+
+			nextInputFileIndex++;
+		}
+
+		while (true) {
+			//get message length
+			MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+			MPI_Get_count(&status, MPI_CHAR, &messageLength);
+
+			//actual receive
+			MPI_Recv(receivedFileName, messageLength, MPI_CHAR, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+			switch(status.MPI_TAG) {
+			case Operations::MAP:
+				filesToSort.push_back(string(receivedFileName));
+
+				if (nextInputFileIndex < numberOfInputFiles) {
+					fileNameChar = stringToChar(fileNames[nextInputFileIndex]);
+					MPI_Send(fileNameChar, fileNames[nextInputFileIndex].length() + 1, MPI_CHAR, status.MPI_SOURCE, Operations::MAP, MPI_COMM_WORLD);
+					nextInputFileIndex++;
+				} else {
+					if (!filesToSort.empty()) {
+						fileNameChar = stringToChar(filesToSort.at(0));
+						MPI_Send(fileNameChar, filesToSort.at(0).length() + 1, MPI_CHAR, status.MPI_SOURCE, Operations::SORT, MPI_COMM_WORLD);
+						filesToSort.erase(filesToSort.begin());
+					}
+				}
+				break;
+			case Operations::SORT:
+				break;
+			}
+		}
+
+	} else {
+		while(true) {
+			//get message length
+			MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+			MPI_Get_count(&status, MPI_CHAR, &messageLength);
+
+			//actual receive
+			MPI_Recv(receivedFileName, messageLength, MPI_CHAR, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+
+			switch(status.MPI_TAG) {
+			case Operations::MAP:
+				outputFileName = doMapping(receivedFileName);
+
+				fileNameChar = stringToChar(outputFileName);
+				MPI_Send(fileNameChar, outputFileName.length() + 1, MPI_CHAR, 0, Operations::MAP, MPI_COMM_WORLD);
+				break;
+			case Operations::SORT:
+				outputFileName = doSort(receivedFileName);
+
+				fileNameChar = stringToChar(outputFileName);
+				MPI_Send(fileNameChar, outputFileName.length() + 1, MPI_CHAR, 0, Operations::SORT, MPI_COMM_WORLD);
+				break;
+			}
+		}
+	}
+
+	MPI_Finalize();
 
 	///*
 	//* MAP phase
@@ -55,31 +140,6 @@ int main(int argc, char *argv[]) {
 	// */
 
 	//doFinalReduce(path + "aShuffleSorted.txt", path);
-	
-	//inputFile.open("reduced.txt");
-	//inputFile >> noskipws;
-	//outFile.open("shuffleSorted.txt");
 
-	//  MPI::Init(argc, argv);
-	//	size = MPI::COMM_WORLD.Get_size();
-	//	rank = MPI::COMM_WORLD.Get_rank();
-	//
-	//	n=1000; // number of intervals
-	//
-	//	MPI::COMM_WORLD.Bcast(&n, 1, MPI::INT, 0);
-	//	h = 1.0 / (double) n;
-	//	sum = 0.0;
-	//	for (i = rank + 1; i <= n; i += size) {
-	//		x = h * ((double) i - 0.5);
-	//		sum += (4.0 / (1.0 + x * x));
-	//	}
-	//	mypi = h * sum;
-	//
-	//	MPI::COMM_WORLD.Reduce(&mypi, &pi, 1, MPI::DOUBLE, MPI::SUM, 0);
-	//	if (rank == 0)
-	//		cout << "pi is approximately " << pi << ", Error is "
-	//				<< fabs(pi - PI25DT) << endl;
-	//
-	//	MPI::Finalize();
 	return 0;
 }

@@ -1,29 +1,24 @@
 #include "Utils.h"
 #include "MRFunctions.h"
 
-void doMapping(string inputFilePath, string outputFilePath) {
+string doMapping(string inputFilePath) {
 	ifstream inputFile;
 	ofstream outFile;
+	string outFileName;
 	string word;
 	char c;
 
 	inputFile.open(inputFilePath);
 	inputFile >> noskipws;
-	outFile.open(outputFilePath);
-
-	int i = 0;
+	outFileName = generateOutputFileName(inputFilePath, Operations::MAP);
+	outFile.open(outFileName);
 
 	while(inputFile >> c) {
-		i++;
 		if (isCharOfWord(c)) {
 			word += tolower(c);
 		} else {
 			if (word != "") {
-				if (i%2 == 0) {
-					writeDocWordCount(outFile, "1.txt", word, 1);
-				} else {
-					writeDocWordCount(outFile, "2.txt", word, 1);
-				}
+				writeDocWordCount(outFile, "1.txt", word, 1);
 			}
 			word = "";
 		}
@@ -31,11 +26,14 @@ void doMapping(string inputFilePath, string outputFilePath) {
 
 	inputFile.close();
 	outFile.close();
+
+	return outFileName;
 }
 
-void doSort(string inputFilePath, string outputFilePath) {
+string doSort(string inputFilePath) {
 	ifstream inputFile;
 	ofstream outFile;
+	string outFileName;
 
 	string line;
 	vector<FrequencyLine> mappedLines;
@@ -43,7 +41,8 @@ void doSort(string inputFilePath, string outputFilePath) {
 
 	inputFile.open(inputFilePath);
 	inputFile >> noskipws;
-	outFile.open(outputFilePath);
+	outFileName = generateOutputFileName(inputFilePath, Operations::SORT);
+	outFile.open(outFileName);
 
 	while(getline(inputFile, line)) {
 		//remove angular brackets
@@ -66,6 +65,8 @@ void doSort(string inputFilePath, string outputFilePath) {
 
 	inputFile.close();
 	outFile.close();
+
+	return outFileName;
 }
 
 void doFirstReduce(string inputFilePath, string outFilePath) {

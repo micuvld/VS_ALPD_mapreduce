@@ -10,9 +10,9 @@
 #include "Utils.h"
 using namespace std;
 
-void doMapping(string inputFilePath, string outputFilePath);
+string doMapping(string inputFilePath);
 
-void doSort(string inputFilePath, string outputFilePath);
+string doSort(string inputFilePath);
 
 void doFirstReduce(string inputFilePath, string outputFilePath);
 

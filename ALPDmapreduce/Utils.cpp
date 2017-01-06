@@ -1,4 +1,5 @@
 #include "Utils.h"
+#include "MRFunctions.h"
 
 vector<string> split(string toSplit, char delim) {
 	stringstream toSplitStream;
@@ -45,9 +46,24 @@ bool compareDocThenWord(const FrequencyLine a, const FrequencyLine b)
 	return false;
 }
 
+string generateOutputFileName(string path, Operations operation) {
+	string fileName;
+	vector<string> tokens = split(path, '/');
+
+	switch(operation) {
+	case Operations::MAP:
+		fileName = "mapped#" + tokens.back();
+		break;
+	case Operations::SORT:
+		fileName = "sorted#" + tokens.back();
+		break;
+	}
+
+	return "output/" + fileName;
+}
 
 bool isCharOfWord(char c) {
-	if (isalpha(c) || c == '\'') {
+	if ((c >= -1 && c <= 255 && isalpha(c)) || c == '\'') {
 		return true;
 	} else {
 		return false;
@@ -58,4 +74,10 @@ void writeDocWordCount(ofstream &outFile, string inputFileName, string word, int
 	outFile << "<" + inputFileName + ","
 		<< word + ","
 		<< to_string(count) + ">\n";
+}
+
+char *stringToChar(string s) {
+	char *c = new char[s.length() + 1];
+	strcpy(c, s.c_str());
+	return c;
 }
