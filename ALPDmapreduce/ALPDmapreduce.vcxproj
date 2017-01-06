@@ -20,6 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ALPDmapreduce.cpp" />
+    <ClCompile Include="MRFunctions.cpp" />
+    <ClCompile Include="Utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MRFunctions.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{995C8BB4-4A78-4729-8D14-76970F279828}</ProjectGuid>

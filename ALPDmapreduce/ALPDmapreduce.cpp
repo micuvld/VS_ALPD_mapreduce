@@ -7,209 +7,45 @@ Copyright   : Your copyright notice
 Description : Compute Pi in MPI C++
 ============================================================================
 */
-#include <math.h> 
-
-#include <fstream>
-#include <iostream>
-#include <algorithm>
-#include <string>
-#include <set>
-#include <vector>
-#include <sstream>
-#include <map>
+#include "Utils.h"
+#include "MRFunctions.h"
 #include "mpi.h"
 using namespace std;
 
-struct FrequencyLine {
-	string docName;
-	string word;
-	int count;
-};
-
-vector<string> split(string toSplit, char delim) {
-	stringstream toSplitStream;
-	string token;
-	vector<string> tokens;
-
-	toSplitStream.str(toSplit);
-	while(getline(toSplitStream, token, delim)) {
-		tokens.push_back(token);
-	}
-
-	return tokens;
-}
-
-bool secondTokenCompare(const string a, const string b) {
-	string fileNameA, wordA, countA;
-	string fileNameB, wordB, countB;
-
-	vector<string> tokensA = split(a, ',');
-	vector<string> tokensB = split(b, ',');
-
-	return tokensA.at(1) < tokensB.at(1);
-}
-
-bool compareWordThenDoc(const FrequencyLine a, const FrequencyLine b) 
-{
-	if (a.word < b.word) return true;
-	if (b.word < a.word) return false;
-
-	if (a.docName < b.docName) return true;
-	if (b.docName < a.docName) return false;
-
-	return false;
-}
-
-
-bool isCharOfWord(char c) {
-	if (isalpha(c) || c == '\'') {
-		return true;
-	} else {
-		return false;
-	}
-}
-
-void writeDocWordCount(ofstream &outFile, string inputFileName, string word, int count) {
-	outFile << "<" + inputFileName + ","
-		<< word + ","
-		<< to_string(count) + ">\n";
-}
-
 int main(int argc, char *argv[]) {
-	//	int n, rank, size, i;
-	//	double PI25DT = 3.141592653589793238462643;
-	//	double mypi, pi, h, sum, x;
-	string text = "";
-	string line;
-	char c;
-	string word = "";
-
+	string path = "output/";
 	ifstream inputFile;
 	ofstream outFile;
 
 	/*
 	* MAP phase
 	*/
-	inputFile.open("test-files/4.txt");
-	inputFile >> noskipws;
-	outFile.open("mapped1.txt");
 
-	int i = 0;
-
-	while(inputFile >> c) {
-		i++;
-		if (isCharOfWord(c)) {
-			word += tolower(c);
-		} else {
-			if (word != "") {
-				if (i%2 == 0) {
-					writeDocWordCount(outFile, "1.txt", word, 1);
-				} else {
-					writeDocWordCount(outFile, "2.txt", word, 1);
-				}
-			}
-			word = "";
-		}
-	}
-
-	inputFile.close();
-	outFile.close();
+	doMapping("test-files/4.txt", path + "mapped1.txt");
 
 	/*
 	* SORT phase
 	*/
-	string fileName;
-	//string word;
-	string count;
-	vector<FrequencyLine> mappedLines;
-	FrequencyLine newMappedLine;
-
-	inputFile.open("mapped1.txt");
-	inputFile >> noskipws;
-	outFile.open("sorted.txt");
-
-	while(getline(inputFile, line)) {
-		//remove angular brackets
-		line.erase(0,1);
-		line.erase(line.length() - 1, 1);
-
-		vector<string> tokens = split(line, ',');
-		newMappedLine.docName = tokens.at(0);
-		newMappedLine.word = tokens.at(1);
-		newMappedLine.count = stoi(tokens.at(2));
-
-		mappedLines.push_back(newMappedLine);
-	}
-
-	sort(mappedLines.begin(), mappedLines.end(), compareWordThenDoc);
-
-	for(FrequencyLine ml : mappedLines) {
-		outFile << "<" + ml.docName + "," + ml.word + "," + to_string(ml.count) + ">" << endl;
-	}
-
-	inputFile.close();
-	outFile.close();
-
+	doSort(path + "mapped1.txt", path + "sorted.txt");
+	
 	/*
 	* REDUCE phase
 	*/
-	inputFile.open("sorted.txt");
-	inputFile >> noskipws;
 
-	map<string, FrequencyLine> mapOfSortedLines;
-	map<string, FrequencyLine>::iterator sortedIterator;
-	FrequencyLine sortedLine;
-
-	int frequencyByFile;
-	vector<string> tokens;
+	doFirstReduce(path + "sorted.txt", path);
 	
+	/*
+	*SHUFFLE SORT phase
+	*/
 
-	while(getline(inputFile, line)) {
-		//remove angular brackets
-		line.erase(0,1);
-		line.erase(line.length() - 1, 1);
-
-		tokens = split(line, ',');
-
-		//docName + word
-		sortedIterator = mapOfSortedLines.find(tokens.at(0) + tokens.at(1));
-
-		//if !exists in map: add it; else: count++
-		if (sortedIterator == mapOfSortedLines.end()) {
-			sortedLine.docName = tokens.at(0);
-			sortedLine.word = tokens.at(1);
-			sortedLine.count = stoi(tokens.at(2));
-			mapOfSortedLines.insert(pair<string,FrequencyLine>(tokens.at(0) + tokens.at(1), sortedLine));
-		} else {
-			(*sortedIterator).second.count++;
-		}
-	}
-
-	char firstLetterFile = '\0';
-	string fileEnding = "Reduced.txt";
-	for(auto docWord : mapOfSortedLines) {
-		if (docWord.second.word.at(0) != firstLetterFile) {
-			firstLetterFile = docWord.second.word.at(0);
-			cout << firstLetterFile;
-			if (outFile.is_open()) {
-				outFile.close();
-			}
-			cout << firstLetterFile + fileEnding;
-			outFile.open(firstLetterFile + fileEnding);
-		}
-		outFile << "<" + docWord.second.docName + "," + docWord.second.word \
-			+ "," + to_string(docWord.second.count) + ">"
-			<< endl;
-	}
-
-	inputFile.close();
-	outFile.close();
+	doShuffleSort(path + "aReduced.txt",path + "aShuffleSorted.txt");
 
 	/*
-	 *SHUFFLE SORT phase
+	 *FINAL REDUCE phase
 	 */
 
-
+	doFinalReduce(path + "aShuffleSorted.txt", path);
+	
 	//inputFile.open("reduced.txt");
 	//inputFile >> noskipws;
 	//outFile.open("shuffleSorted.txt");
@@ -237,4 +73,3 @@ int main(int argc, char *argv[]) {
 	//	MPI::Finalize();
 	return 0;
 }
-
