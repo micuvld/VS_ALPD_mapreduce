@@ -14,7 +14,7 @@ string doMapping(string inputFilePath);
 
 string doSort(string inputFilePath);
 
-void doFirstReduce(string inputFilePath, string outputFilePath);
+void doFirstReduce(string inputFilePath);
 
 void doShuffleSort(string inputFileString, string outputFileString);
 

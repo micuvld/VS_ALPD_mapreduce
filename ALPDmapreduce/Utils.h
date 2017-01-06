@@ -34,6 +34,8 @@ bool compareDocThenWord(const FrequencyLine a, const FrequencyLine b);
 
 string generateOutputFileName(string path, Operations operation);
 
+string generateOutputFileName(char letter, Operations operation);
+
 bool isCharOfWord(char c);
 
 void writeDocWordCount(ofstream &outFile, string inputFileName, string word, int count);

@@ -1,17 +1,6 @@
-﻿Build started 1/7/2017 12:06:57 AM.
+﻿Build started 1/7/2017 1:15:01 AM.
      1>Project "F:\EPart\Facultate\An IV\ALPD\Tema\ALPDmapreduce\ALPDmapreduce\ALPDmapreduce.vcxproj" on node 2 (Build target(s)).
-     1>ClCompile:
-         I:\VS2012\VC\bin\x86_amd64\CL.exe /c /I"C:\Program Files (x86)\Microsoft SDKs\MPI\Include\\" /I"C:\Program Files (x86)\Microsoft SDKs\MPI\Include\\x64" /Zi /nologo /W3 /WX- /Od /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc110.pdb" /Gd /TP /FImpi.h /errorReport:prompt ALPDmapreduce.cpp MRFunctions.cpp
-         MRFunctions.cpp
-         ALPDmapreduce.cpp
-     1>ALPDmapreduce.cpp(54): warning C4267: 'argument' : conversion from 'size_t' to 'int', possible loss of data
-     1>ALPDmapreduce.cpp(72): warning C4267: 'argument' : conversion from 'size_t' to 'int', possible loss of data
-     1>ALPDmapreduce.cpp(77): warning C4267: 'argument' : conversion from 'size_t' to 'int', possible loss of data
-     1>ALPDmapreduce.cpp(101): warning C4267: 'argument' : conversion from 'size_t' to 'int', possible loss of data
-     1>ALPDmapreduce.cpp(107): warning C4267: 'argument' : conversion from 'size_t' to 'int', possible loss of data
-     1>ALPDmapreduce.cpp(24): warning C4101: 'j' : unreferenced local variable
-         Generating Code...
-       Link:
+     1>Link:
          I:\VS2012\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"F:\EPart\Facultate\An IV\ALPD\Tema\ALPDmapreduce\x64\Debug\ALPDmapreduce.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Program Files (x86)\Microsoft SDKs\MPI\Lib\x64\\" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib msmpi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:\EPart\Facultate\An IV\ALPD\Tema\ALPDmapreduce\x64\Debug\ALPDmapreduce.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\EPart\Facultate\An IV\ALPD\Tema\ALPDmapreduce\x64\Debug\ALPDmapreduce.lib" /MACHINE:X64 x64\Debug\ALPDmapreduce.obj
          x64\Debug\MRFunctions.obj
          x64\Debug\Utils.obj
@@ -20,4 +9,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:05.06
+Time Elapsed 00:00:01.00

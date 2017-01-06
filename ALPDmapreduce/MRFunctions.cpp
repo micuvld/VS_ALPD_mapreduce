@@ -69,10 +69,11 @@ string doSort(string inputFilePath) {
 	return outFileName;
 }
 
-void doFirstReduce(string inputFilePath, string outFilePath) {
+void doFirstReduce(string inputFilePath) {
 	ifstream inputFile;
 	ofstream outFile;
 	string line;
+	string fileName;
 
 	inputFile.open(inputFilePath);
 	inputFile >> noskipws;
@@ -106,15 +107,18 @@ void doFirstReduce(string inputFilePath, string outFilePath) {
 	}
 
 	char firstLetterFile = (*mapOfSortedLines.begin()).second.word.at(0);
-	string fileEnding = "Reduced.txt";
+	do {
+		outFile.open(generateOutputFileName(firstLetterFile, Operations::REDUCE), ios_base::app);
+	} while(!outFile.is_open());
 
-	outFile.open(outFilePath + firstLetterFile + fileEnding, ios_base::app);
 	for(auto docWord : mapOfSortedLines) {
 		if (docWord.second.word.at(0) != firstLetterFile) {
 			firstLetterFile = docWord.second.word.at(0);
-			outFile.close();			
-			outFile.open(outFilePath + firstLetterFile + fileEnding , ios_base::app);
-			cout <<firstLetterFile + fileEnding;
+			outFile.close();	
+
+			do {
+			outFile.open(generateOutputFileName(firstLetterFile, Operations::REDUCE) , ios_base::app);
+			} while(!outFile.is_open());
 		}
 
 		outFile << "<" + docWord.second.docName + "," + docWord.second.word \

@@ -62,6 +62,20 @@ string generateOutputFileName(string path, Operations operation) {
 	return "output/" + fileName;
 }
 
+string generateOutputFileName(char letter, Operations operation) {
+	string fileName;
+	string fileNameEnding;
+
+	switch(operation) {
+	case Operations::REDUCE:
+		fileNameEnding = "Reduced.txt";
+		fileName = letter + fileNameEnding;
+		break;
+	}
+
+	return "output/" + fileName;
+}
+
 bool isCharOfWord(char c) {
 	if ((c >= -1 && c <= 255 && isalpha(c)) || c == '\'') {
 		return true;

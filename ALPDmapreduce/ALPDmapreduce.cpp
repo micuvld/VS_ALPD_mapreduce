@@ -19,7 +19,6 @@ int main(int argc, char *argv[]) {
 	string outputFileName;
 	ifstream inputFile;
 	ofstream outFile;
-	string fileNames[25];
 	char *fileNameChar;
 	char i,j;
 
@@ -27,17 +26,19 @@ int main(int argc, char *argv[]) {
 	int my_rank;
 	int numberOfWorkers;
 
-	int numberOfInputFiles = 25;
+	int numberOfInputFiles = 2;
 	int numberOfMappedFiles = 0;
 	int nextInputFileIndex = 0;
 	char receivedFileName[50];
 	int messageLength;
 	MPI_Status status;
 
+	vector<string> fileNames;
 	vector<string> filesToSort;
+	vector<string> filesToReduce;
 
 	for (i = 1; i <= numberOfInputFiles; ++i) {
-		fileNames[i-1] = (inputFilesPath + to_string((i + '\0')) + inputFilesExtension);
+		fileNames.push_back(inputFilesPath + to_string((i + '\0')) + inputFilesExtension);
 	}
 
 	MPI_Init(&argc, &argv);
@@ -49,9 +50,10 @@ int main(int argc, char *argv[]) {
 
 	if (my_rank == 0) {
 		//send files to all proceses
-		while (nextInputFileIndex < numberOfWorkers) {
-			fileNameChar = stringToChar(fileNames[nextInputFileIndex]);
-			MPI_Send(fileNameChar, fileNames[nextInputFileIndex].length() + 1, MPI_CHAR, nextInputFileIndex + 1, Operations::MAP, MPI_COMM_WORLD);
+		while (!fileNames.empty() && nextInputFileIndex < numberOfWorkers) {
+			fileNameChar = stringToChar(fileNames.at(0));
+			MPI_Send(fileNameChar, fileNames.at(0).length() + 1, MPI_CHAR, nextInputFileIndex + 1, Operations::MAP, MPI_COMM_WORLD);
+			fileNames.erase(fileNames.begin());
 
 			nextInputFileIndex++;
 		}
@@ -67,10 +69,10 @@ int main(int argc, char *argv[]) {
 			case Operations::MAP:
 				filesToSort.push_back(string(receivedFileName));
 
-				if (nextInputFileIndex < numberOfInputFiles) {
-					fileNameChar = stringToChar(fileNames[nextInputFileIndex]);
-					MPI_Send(fileNameChar, fileNames[nextInputFileIndex].length() + 1, MPI_CHAR, status.MPI_SOURCE, Operations::MAP, MPI_COMM_WORLD);
-					nextInputFileIndex++;
+				if (!fileNames.empty()) {
+					fileNameChar = stringToChar(fileNames.at(0));
+					MPI_Send(fileNameChar, fileNames.at(0).length() + 1, MPI_CHAR, status.MPI_SOURCE, Operations::MAP, MPI_COMM_WORLD);
+					fileNames.erase(fileNames.begin());
 				} else {
 					if (!filesToSort.empty()) {
 						fileNameChar = stringToChar(filesToSort.at(0));
@@ -80,7 +82,26 @@ int main(int argc, char *argv[]) {
 				}
 				break;
 			case Operations::SORT:
+				filesToReduce.push_back(string(receivedFileName));
+
+				if (!filesToSort.empty()) {
+					fileNameChar = stringToChar(filesToSort.at(0));
+					MPI_Send(fileNameChar, filesToSort.at(0).length() + 1, MPI_CHAR, status.MPI_SOURCE, Operations::SORT, MPI_COMM_WORLD);
+					filesToSort.erase(filesToSort.begin());
+				} else {
+					if(!filesToReduce.empty()) {
+						fileNameChar = stringToChar(filesToReduce.at(0));
+						MPI_Send(fileNameChar, filesToReduce.at(0).length() + 1,  MPI_CHAR, status.MPI_SOURCE, Operations::REDUCE, MPI_COMM_WORLD);
+						filesToReduce.erase(filesToReduce.begin());
+					}
+				}
 				break;
+			case Operations::REDUCE:
+				if(!filesToReduce.empty()) {
+					fileNameChar = stringToChar(filesToReduce.at(0));
+					MPI_Send(fileNameChar, filesToReduce.at(0).length() + 1,  MPI_CHAR, status.MPI_SOURCE, Operations::REDUCE, MPI_COMM_WORLD);
+					filesToReduce.erase(filesToReduce.begin());
+				}
 			}
 		}
 
@@ -106,6 +127,11 @@ int main(int argc, char *argv[]) {
 				fileNameChar = stringToChar(outputFileName);
 				MPI_Send(fileNameChar, outputFileName.length() + 1, MPI_CHAR, 0, Operations::SORT, MPI_COMM_WORLD);
 				break;
+			case Operations::REDUCE:
+				doFirstReduce(receivedFileName);
+
+				//fileNameChar = stringToChar(outputFileName);
+				MPI_Send(receivedFileName, string(receivedFileName).length() + 1, MPI_CHAR, 0, Operations::REDUCE, MPI_COMM_WORLD);
 			}
 		}
 	}
