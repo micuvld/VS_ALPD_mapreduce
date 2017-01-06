@@ -14,37 +14,47 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 	string path = "output/";
+	string inputFilesPath = "test-files/";
+	string inputFilesExtension = ".txt";
 	ifstream inputFile;
 	ofstream outFile;
 
-	/*
-	* MAP phase
-	*/
+	string fileNames[25];
+	char i;
 
-	doMapping("test-files/4.txt", path + "mapped1.txt");
+	for (i = 1; i < 25; ++i) {
+		fileNames[i-1] = (inputFilesPath + to_string((i + '\0')) + inputFilesExtension);
+		cout << fileNames[i-1]<<endl;
+	}
 
-	/*
-	* SORT phase
-	*/
-	doSort(path + "mapped1.txt", path + "sorted.txt");
-	
-	/*
-	* REDUCE phase
-	*/
+	///*
+	//* MAP phase
+	//*/
 
-	doFirstReduce(path + "sorted.txt", path);
-	
-	/*
-	*SHUFFLE SORT phase
-	*/
+	//doMapping("test-files/4.txt", path + "mapped1.txt");
 
-	doShuffleSort(path + "aReduced.txt",path + "aShuffleSorted.txt");
+	///*
+	//* SORT phase
+	//*/
+	//doSort(path + "mapped1.txt", path + "sorted.txt");
+	//
+	///*
+	//* REDUCE phase
+	//*/
 
-	/*
-	 *FINAL REDUCE phase
-	 */
+	//doFirstReduce(path + "sorted.txt", path);
+	//
+	///*
+	//*SHUFFLE SORT phase
+	//*/
 
-	doFinalReduce(path + "aShuffleSorted.txt", path);
+	//doShuffleSort(path + "aReduced.txt",path + "aShuffleSorted.txt");
+
+	///*
+	// *FINAL REDUCE phase
+	// */
+
+	//doFinalReduce(path + "aShuffleSorted.txt", path);
 	
 	//inputFile.open("reduced.txt");
 	//inputFile >> noskipws;
