@@ -4,13 +4,15 @@
 string doMapping(string inputFilePath) {
 	ifstream inputFile;
 	ofstream outFile;
+	string inputFileName;
 	string outFileName;
 	string word;
 	char c;
 
+	inputFileName = getFileNameFromPath(inputFilePath);
 	inputFile.open(inputFilePath);
 	inputFile >> noskipws;
-	outFileName = generateOutputFileName(inputFilePath, Operations::MAP);
+	outFileName = generateFileName(inputFilePath, Operations::MAP);
 	outFile.open(outFileName);
 
 	while(inputFile >> c) {
@@ -18,7 +20,7 @@ string doMapping(string inputFilePath) {
 			word += tolower(c);
 		} else {
 			if (word != "") {
-				writeDocWordCount(outFile, "1.txt", word, 1);
+				writeDocWordCount(outFile, inputFileName, word, 1);
 			}
 			word = "";
 		}
@@ -41,7 +43,7 @@ string doSort(string inputFilePath) {
 
 	inputFile.open(inputFilePath);
 	inputFile >> noskipws;
-	outFileName = generateOutputFileName(inputFilePath, Operations::SORT);
+	outFileName = generateFileName(inputFilePath, Operations::SORT);
 	outFile.open(outFileName);
 
 	while(getline(inputFile, line)) {
@@ -108,16 +110,17 @@ void doFirstReduce(string inputFilePath) {
 
 	char firstLetterFile = (*mapOfSortedLines.begin()).second.word.at(0);
 	do {
-		outFile.open(generateOutputFileName(firstLetterFile, Operations::REDUCE), ios_base::app);
+		outFile.open(generateFileName(firstLetterFile, Operations::REDUCE), ios_base::app);
 	} while(!outFile.is_open());
 
 	for(auto docWord : mapOfSortedLines) {
 		if (docWord.second.word.at(0) != firstLetterFile) {
+			flush(cout);
 			firstLetterFile = docWord.second.word.at(0);
 			outFile.close();	
 
 			do {
-			outFile.open(generateOutputFileName(firstLetterFile, Operations::REDUCE) , ios_base::app);
+				outFile.open(generateFileName(firstLetterFile, Operations::REDUCE) , ios_base::app);
 			} while(!outFile.is_open());
 		}
 
@@ -130,10 +133,11 @@ void doFirstReduce(string inputFilePath) {
 	outFile.close();
 }
 
-void doShuffleSort(string inputFileString, string outputFileString) {
+string doShuffleSort(string inputFileString) {
 	ifstream inputFile;
 	ofstream outFile;
 	vector<string> tokens;
+	string outFileName;
 
 	string line;
 
@@ -142,7 +146,8 @@ void doShuffleSort(string inputFileString, string outputFileString) {
 
 	inputFile.open(inputFileString);
 	inputFile >> noskipws;
-	outFile.open(outputFileString, ios_base::app);
+	outFileName = generateFileName(inputFileString, Operations::SHUFFLESORT);
+	outFile.open(outFileName, ios_base::app);
 
 	while(getline(inputFile, line)) {
 		//remove angular brackets
@@ -165,16 +170,21 @@ void doShuffleSort(string inputFileString, string outputFileString) {
 
 	inputFile.close();
 	outFile.close();
+
+	return outFileName;
 }
 
-void doFinalReduce(string inputFileString, string outFilePath) {
+void doFinalReduce(string inputFileString) {
 	ifstream inputFile;
 	ofstream outFile;
+	string outFileName;
 	string line;
 	vector<string> tokens;
 
 	inputFile.open(inputFileString);
 	inputFile >> noskipws;
+	outFileName = generateFileName(inputFileString, Operations::FINALREDUCE);
+	outFile.open(outFileName, ios_base::app);
 
 	map<string, string> mapOfShuffleSortedLines;
 	map<string, string>::iterator shuffleSortedIterator;
@@ -198,17 +208,7 @@ void doFinalReduce(string inputFileString, string outFilePath) {
 		}
 	}
 
-	char firstLetterFile = (*mapOfShuffleSortedLines.begin()).first.at(0);
-	string fileEnding = "FinalReduced.txt";
-
-	outFile.open(outFilePath + firstLetterFile + fileEnding, ios_base::app);
 	for(auto word : mapOfShuffleSortedLines) {
-		if (word.first.at(0) != firstLetterFile) {
-			firstLetterFile = word.first.at(0);
-			outFile.close();			
-			outFile.open(outFilePath + firstLetterFile + fileEnding , ios_base::app);
-		}
-
 		word.second.erase(word.second.length() - 1, 1);
 		outFile << "<" + word.first + "," + word.second + ">" << endl;
 	}

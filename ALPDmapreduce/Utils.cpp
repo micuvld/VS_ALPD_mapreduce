@@ -46,8 +46,14 @@ bool compareDocThenWord(const FrequencyLine a, const FrequencyLine b)
 	return false;
 }
 
-string generateOutputFileName(string path, Operations operation) {
+string getFileNameFromPath(string path) {
+	return split(path, '/').back();
+}
+
+string generateFileName(string path, Operations operation) {
+	string pathWithoutFileName = "output/";
 	string fileName;
+	string fileNameEnding;
 	vector<string> tokens = split(path, '/');
 
 	switch(operation) {
@@ -57,18 +63,31 @@ string generateOutputFileName(string path, Operations operation) {
 	case Operations::SORT:
 		fileName = "sorted#" + tokens.back();
 		break;
+	case Operations::SHUFFLESORT:
+		fileNameEnding = "ShuffleSorted.txt";
+		fileName = tokens.back().at(0) + fileNameEnding;
+		break;
+	case Operations::FINALREDUCE:
+		pathWithoutFileName = "final-results/";
+		fileNameEnding = "FinalReduce.txt";
+		fileName = tokens.back().at(0) + fileNameEnding;
+		break;
 	}
 
-	return "output/" + fileName;
+	return pathWithoutFileName + fileName;
 }
 
-string generateOutputFileName(char letter, Operations operation) {
+string generateFileName(char letter, Operations operation) {
 	string fileName;
 	string fileNameEnding;
 
 	switch(operation) {
 	case Operations::REDUCE:
 		fileNameEnding = "Reduced.txt";
+		fileName = letter + fileNameEnding;
+		break;
+	case Operations::SHUFFLESORT:
+		fileNameEnding = "ShuffleSorted.txt";
 		fileName = letter + fileNameEnding;
 		break;
 	}

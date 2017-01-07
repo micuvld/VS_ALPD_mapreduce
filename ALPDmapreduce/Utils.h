@@ -21,7 +21,8 @@ enum Operations {
 	SORT,
 	REDUCE,
 	SHUFFLESORT,
-	FINALREDUCE
+	FINALREDUCE,
+	END
 };
 
 vector<string> split(string toSplit, char delim);
@@ -32,9 +33,11 @@ bool compareWordThenDoc(const FrequencyLine a, const FrequencyLine b);
 
 bool compareDocThenWord(const FrequencyLine a, const FrequencyLine b);
 
-string generateOutputFileName(string path, Operations operation);
+string getFileNameFromPath(string path);
 
-string generateOutputFileName(char letter, Operations operation);
+string generateFileName(string path, Operations operation);
+
+string generateFileName(char letter, Operations operation);
 
 bool isCharOfWord(char c);
 

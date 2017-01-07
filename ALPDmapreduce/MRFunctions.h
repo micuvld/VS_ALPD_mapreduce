@@ -16,6 +16,6 @@ string doSort(string inputFilePath);
 
 void doFirstReduce(string inputFilePath);
 
-void doShuffleSort(string inputFileString, string outputFileString);
+string doShuffleSort(string inputFileString);
 
-void doFinalReduce(string inputFileString, string outputFilePath);
+void doFinalReduce(string inputFileString);
