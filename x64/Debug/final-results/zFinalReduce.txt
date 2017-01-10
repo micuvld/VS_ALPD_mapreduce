@@ -1,0 +1,10 @@
+<zap,{1.txt,1}>
+<zapping,{2.txt,1}>
+<zero,{1.txt,1},{2.txt,2}>
+<zigzag,{1.txt,1}>
+<zip,{1.txt,3}>
+<zippers,{2.txt,1}>
+<zips,{1.txt,1},{2.txt,1}>
+<zone,{2.txt,4}>
+<zones,{2.txt,1}>
+<zoom,{1.txt,1}>

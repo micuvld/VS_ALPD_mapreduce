@@ -44,3 +44,5 @@ bool isCharOfWord(char c);
 void writeDocWordCount(ofstream &outFile, string inputFileName, string word, int count);
 
 char *stringToChar(string s);
+
+void writeConcurrent(string filePath, string toWrite);

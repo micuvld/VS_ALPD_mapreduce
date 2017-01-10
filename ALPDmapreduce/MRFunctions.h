@@ -7,6 +7,7 @@
 #include <vector>
 #include <sstream>
 #include <map>
+#include <windows.h>
 #include "Utils.h"
 using namespace std;
 

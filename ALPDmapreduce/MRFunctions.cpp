@@ -59,7 +59,7 @@ string doSort(string inputFilePath) {
 		mappedLines.push_back(newMappedLine);
 	}
 
-	sort(mappedLines.begin(), mappedLines.end(), compareWordThenDoc);
+	std::sort(mappedLines.begin(), mappedLines.end(), compareWordThenDoc);
 
 	for(FrequencyLine ml : mappedLines) {
 		outFile << "<" + ml.docName + "," + ml.word + "," + to_string(ml.count) + ">" << endl;
@@ -109,24 +109,12 @@ void doFirstReduce(string inputFilePath) {
 	}
 
 	char firstLetterFile = (*mapOfSortedLines.begin()).second.word.at(0);
-	do {
-		outFile.open(generateFileName(firstLetterFile, Operations::REDUCE), ios_base::app);
-	} while(!outFile.is_open());
 
 	for(auto docWord : mapOfSortedLines) {
-		if (docWord.second.word.at(0) != firstLetterFile) {
-			flush(cout);
-			firstLetterFile = docWord.second.word.at(0);
-			outFile.close();	
-
-			do {
-				outFile.open(generateFileName(firstLetterFile, Operations::REDUCE) , ios_base::app);
-			} while(!outFile.is_open());
-		}
-
-		outFile << "<" + docWord.second.docName + "," + docWord.second.word \
-			+ "," + to_string(docWord.second.count) + ">"
-			<< endl;
+		firstLetterFile = docWord.second.word.at(0);
+		string filePath = generateFileName(firstLetterFile, Operations::REDUCE);
+		writeConcurrent(filePath, "<" + docWord.second.docName + "," + docWord.second.word \
+						+ "," + to_string(docWord.second.count) + ">");
 	}
 
 	inputFile.close();
@@ -147,6 +135,7 @@ string doShuffleSort(string inputFileString) {
 	inputFile.open(inputFileString);
 	inputFile >> noskipws;
 	outFileName = generateFileName(inputFileString, Operations::SHUFFLESORT);
+	
 	outFile.open(outFileName, ios_base::app);
 
 	while(getline(inputFile, line)) {
@@ -158,16 +147,16 @@ string doShuffleSort(string inputFileString) {
 		newReducedLine.docName = tokens.at(0);
 		newReducedLine.word = tokens.at(1);
 		newReducedLine.count = stoi(tokens.at(2));
-
+		
 		reducedLines.push_back(newReducedLine);
 	}
 
-	sort(reducedLines.begin(), reducedLines.end(), compareWordThenDoc);
+	std::sort(reducedLines.begin(), reducedLines.end(), compareWordThenDoc);
 
 	for(auto rl : reducedLines) {
 		outFile << "<" + rl.word + "," + rl.docName + "," + to_string(rl.count) + ">" << endl;
 	}
-
+	
 	inputFile.close();
 	outFile.close();
 

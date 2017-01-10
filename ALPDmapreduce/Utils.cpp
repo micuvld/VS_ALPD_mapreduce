@@ -114,3 +114,42 @@ char *stringToChar(string s) {
 	strcpy(c, s.c_str());
 	return c;
 }
+
+void writeConcurrent(string filePath, string toWrite) {
+	  HANDLE hFile;
+	  DWORD  bytesToWrite, dwBytesWritten, dwPos;
+      BYTE   buff[4096];
+	  wstring wFilePath;
+	  wstring wToWrite;
+	  OVERLAPPED overlapped;
+
+	  boolean isLocked = false;
+
+	  wFilePath.assign(filePath.begin(), filePath.end());
+	  hFile = CreateFile(wFilePath.c_str(), // open Two.txt
+              FILE_APPEND_DATA,         // open for writing
+              FILE_SHARE_WRITE,          // allow multiple readers
+              NULL,                     // no security
+              OPEN_ALWAYS,              // open or create
+              FILE_ATTRIBUTE_NORMAL,    // normal file
+              NULL);                    // no attr. template
+
+	  if (hFile == INVALID_HANDLE_VALUE)
+	  {
+		 cout << "Could not open file: " << filePath << endl;
+		 return;
+	  }
+
+	  toWrite += "\r\n";
+	  wToWrite.assign(toWrite.begin(), toWrite.end());
+
+	  dwPos = SetFilePointer(hFile, 0, NULL, FILE_END);
+	  overlapped.Offset = wToWrite.length();
+	  overlapped.OffsetHigh = 0;
+	  overlapped.hEvent = 0;
+	  LockFileEx(hFile, LOCKFILE_EXCLUSIVE_LOCK, 0, toWrite.length(), 0, &overlapped);
+      WriteFile(hFile, toWrite.c_str(), toWrite.length(), &dwBytesWritten, NULL);
+      UnlockFile(hFile, dwPos, 0, toWrite.length(), 0);
+
+	  CloseHandle(hFile);
+}

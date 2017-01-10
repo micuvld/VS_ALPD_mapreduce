@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
 
 				if (!filesToShuffleSort.empty()) {
 					fileNameChar = stringToChar(filesToShuffleSort.at(0));
-					cout << "Sent SS " << fileNameChar << " to " << status.MPI_SOURCE << endl;
+					cout << "Sent SS " << getFileNameFromPath(fileNameChar) << " to " << status.MPI_SOURCE << endl;
 					flush(cout);
 
 					MPI_Send(fileNameChar, filesToShuffleSort.at(0).length() + 1, MPI_CHAR, status.MPI_SOURCE, Operations::SHUFFLESORT, MPI_COMM_WORLD);
@@ -198,7 +198,8 @@ int main(int argc, char *argv[]) {
 				break;
 			case Operations::FINALREDUCE:
 				numberOfFinalReducedFiles++;
-
+				cout << endl<<"Left: " + filesToFinalReduce.size() << endl;
+				flush(cout);
 				if (!filesToFinalReduce.empty() && numberOfFinalReducedFiles < numberOfSecondPhaseFiles) {
 					fileNameChar = stringToChar(filesToFinalReduce.at(0));
 					cout << "Sent FR " << fileNameChar << " to " << status.MPI_SOURCE << endl;
@@ -225,6 +226,7 @@ int main(int argc, char *argv[]) {
 	} else {
 		while(!jobDone) {
 			//get message length
+			cout << endl << my_rank << " WAITING FOR MESSAGE" << endl;
 			MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 			MPI_Get_count(&status, MPI_CHAR, &messageLength);
 
